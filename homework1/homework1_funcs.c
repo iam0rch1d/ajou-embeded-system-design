@@ -2,7 +2,7 @@
 
 // inputSumProduct() - Read binary file and get sum and product from binary file "fileSumProduct.dat". Store in array.
 void inputSumProduct(int* arrSumProduct) {
-    FILE* file = fopen("part2/fileSumProduct.dat", "rb");
+    FILE* file = fopen("fileSumProduct.dat", "rb");
 
     if (file == NULL) {
         printf("Can't open file with \'rb\' option.\n");
