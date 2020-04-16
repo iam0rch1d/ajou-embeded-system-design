@@ -4,7 +4,7 @@ CFLAGS=-O2 -g
 SUBDIRS=part1 part2 part2/part3
 OBJS=homework1.o homework1_funcs.o
 TARGET=homework1.out
-CLEANTARGET=fileSumProduct.dat
+CLEANTARGET=fileSumProduct.dat \
 	    part1/part1.o part1/part1_funcs.o part1/part1.out \
 	    part2/part2.o part2/part2_funcs.o part2/part2.out \
 	    part2/part3/part3.o part2/part3/part3_funcs.o part2/part3/part3.out
