@@ -7,9 +7,9 @@
 int main() {
     int arrNum[NUM_NUMBER];
 
-    printf("Input first number ([%d-%d]):", MIN_NUMBER, MAX_NUMBER);
+    printf("Input first number. ([%d-%d]):", MIN_NUMBER, MAX_NUMBER);
     scanf("%d", arrNum);
-    printf("Input second number ([%d-%d]):", MIN_NUMBER, MAX_NUMBER);
+    printf("Input second number. ([%d-%d]):", MIN_NUMBER, MAX_NUMBER);
     scanf("%d", arrNum + 1);
 
     if (isNumberValid(arrNum) == 0) {
