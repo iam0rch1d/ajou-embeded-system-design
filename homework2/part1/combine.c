@@ -145,7 +145,7 @@ int main() {
     Combine4(vector, &sum);
 #endif
 
-    printf("Sum of vector: %ld", sum);
+    printf("Sum of vector: %ld\n", sum);
 
     return 0;
 }

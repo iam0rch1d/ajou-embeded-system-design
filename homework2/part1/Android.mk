@@ -9,4 +9,3 @@ LOCAL_MODULE:=combine
 LOCAL_SRC_FILES:=combine.c
 
 include $(BUILD_EXECUTABLE)
-
