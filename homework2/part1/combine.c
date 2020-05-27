@@ -3,8 +3,8 @@
 #include <sys/time.h>
 
 #define COMBINE_VERSION 1
-#define NUM_ELEMENT 10000
-#define NUM_COMBINE_LOOP 10000
+#define NUM_ELEMENT 100000
+#define NUM_COMBINE_LOOP 100000
 #define CPU_FREQUENCY 442000000
 
 enum boolean {
@@ -22,10 +22,10 @@ Vector* InitializeVector(int length);
 int GetVectorLength(Vector* vector);
 int* GetVectorData(Vector* vector);
 int GetVectorDataElement(Vector* vector, int index, int* destination);
-void Combine1(Vector* vector, int* destination);
-void Combine2(Vector* vector, int* destination);
-void Combine3(Vector* vector, int* destination);
-void Combine4(Vector* vector, int* destination);
+void Combine1(Vector* vector, long long int* destination);
+void Combine2(Vector* vector, long long int* destination);
+void Combine3(Vector* vector, long long int* destination);
+void Combine4(Vector* vector, long long int* destination);
 
 
 Vector* InitializeVector(int length) {
@@ -74,7 +74,7 @@ int GetVectorDataElement(Vector* vector, int index, int* destination) {
     return true;
 }
 
-void Combine1(Vector* vector, int* destination) {
+void Combine1(Vector* vector, long long int* destination) {
     int i;
 
     *destination = 0;
@@ -88,7 +88,7 @@ void Combine1(Vector* vector, int* destination) {
     }
 }
 
-void Combine2(Vector* vector, int* destination) {
+void Combine2(Vector* vector, long long int* destination) {
     int i;
     int length = GetVectorLength(vector);
 
@@ -103,7 +103,7 @@ void Combine2(Vector* vector, int* destination) {
     }
 }
 
-void Combine3(Vector* vector, int* destination) {
+void Combine3(Vector* vector, long long int* destination) {
     int i;
     int length = GetVectorLength(vector);
     int* data = GetVectorData(vector);
@@ -115,11 +115,11 @@ void Combine3(Vector* vector, int* destination) {
     }
 }
 
-void Combine4(Vector* vector, int* destination) {
+void Combine4(Vector* vector, long long int* destination) {
     int i;
     int length = GetVectorLength(vector);
     int* data = GetVectorData(vector);
-    int sum = 0;
+    long long int sum = 0;
 
     for (i = 0; i < length; i++) {
         sum += data[i];
@@ -135,7 +135,7 @@ int main() {
     struct timeval timeFinish;
     double timeSeconds;
     Vector* vector = InitializeVector(NUM_ELEMENT);
-    int sum;
+    long long int sum;
     int i;
 
     if (file == NULL) {
@@ -164,7 +164,11 @@ int main() {
 
     timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
 
-    printf("Sum of vector: %d,%03d,%03d\n", sum / 1000000 % 1000, sum / 1000 % 1000, sum % 1000);
+    printf("Sum of vector: %lld,%03lld,%03lld,%03lld\n",
+	    sum / 1000000000 % 1000,
+	    sum / 1000000 % 1000,
+	    sum / 1000 % 1000,
+	    sum % 1000);
     printf("Elapsed time: %f [sec]\n", timeSeconds);
     printf("CPE: %f\n", timeSeconds * CPU_FREQUENCY / NUM_ELEMENT / NUM_COMBINE_LOOP);
 
