@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #define COMBINE_VERSION 1
 #define NUM_ELEMENT 10000
+#define NUM_COMBINE_LOOP 10000
 
 enum boolean {
     false = 0,
@@ -128,6 +130,9 @@ void Combine4(Vector* vector, int* destination) {
 
 int main() {
     FILE* file = fopen("vector_data.txt", "r");
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
     Vector* vector = InitializeVector(NUM_ELEMENT);
     int sum;
     int i;
@@ -140,17 +145,27 @@ int main() {
         }
     }
 
-#if COMBINE_VERSION == 1
-    Combine1(vector, &sum);
-#elif COMBINE_VERSION == 2
-    Combine2(vector, &sum);
-#elif COMBINE_VERSION == 3
-    Combine3(vector, &sum);
-#elif COMBINE_VERSION == 4
-    Combine4(vector, &sum);
-#endif
+    gettimeofday(&timeStart, NULL);
 
-    printf("Sum of vector: %d,%d,%d\n", sum / 1000000 % 1000, sum / 1000 % 1000, sum % 1000);
+    for (i = 0; i < NUM_COMBINE_LOOP; i++) {
+#if COMBINE_VERSION == 1
+        Combine1(vector, &sum);
+#elif COMBINE_VERSION == 2
+        Combine2(vector, &sum);
+#elif COMBINE_VERSION == 3
+        Combine3(vector, &sum);
+#elif COMBINE_VERSION == 4
+        Combine4(vector, &sum);
+#endif
+    }
+
+    gettimeofday(&timeFinish, NULL);
+
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Sum of vector: %d,%03d,%03d\n", sum / 1000000 % 1000, sum / 1000 % 1000, sum % 1000);
+    printf("Elapsed time: %f [sec]\n", timeSeconds);
+
     free(vector);
     fclose(file);
 
