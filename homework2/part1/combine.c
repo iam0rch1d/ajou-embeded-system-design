@@ -166,7 +166,7 @@ int main() {
 
     printf("Sum of vector: %d,%03d,%03d\n", sum / 1000000 % 1000, sum / 1000 % 1000, sum % 1000);
     printf("Elapsed time: %f [sec]\n", timeSeconds);
-    print("CPE: %f\n", timeSeconds * CPU_FREQUENCY / NUM_ELEMENT / NUM_COMBINE_LOOP);
+    printf("CPE: %f\n", timeSeconds * CPU_FREQUENCY / NUM_ELEMENT / NUM_COMBINE_LOOP);
 
     free(vector);
     fclose(file);
