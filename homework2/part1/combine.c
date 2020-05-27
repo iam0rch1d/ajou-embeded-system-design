@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #define COMBINE_VERSION 1
+#define NUM_ELEMENT 10000
 
 enum boolean {
     false = 0,
@@ -10,18 +11,18 @@ enum boolean {
 
 typedef struct Vector {
     int length;
-    long int* data;
+    int* data;
 } Vector;
 
 
 Vector* InitializeVector(int length);
 int GetVectorLength(Vector* vector);
-long int* GetVectorData(Vector* vector);
-int GetVectorDataElement(Vector* vector, int index, long int* destination);
-void Combine1(Vector* vector, long int* destination);
-void Combine2(Vector* vector, long int* destination);
-void Combine3(Vector* vector, long int* destination);
-void Combine4(Vector* vector, long int* destination);
+int* GetVectorData(Vector* vector);
+int GetVectorDataElement(Vector* vector, int index, int* destination);
+void Combine1(Vector* vector, int* destination);
+void Combine2(Vector* vector, int* destination);
+void Combine3(Vector* vector, int* destination);
+void Combine4(Vector* vector, int* destination);
 
 
 Vector* InitializeVector(int length) {
@@ -34,7 +35,7 @@ Vector* InitializeVector(int length) {
     result->length = length;
 
     if (length > 0) {
-        long int* data = calloc(length, sizeof(long int));
+        int* data = calloc(length, sizeof(int));
 
         if (!data) {
             free(result);
@@ -56,11 +57,11 @@ int GetVectorLength(Vector* vector) {
     return vector->length;
 }
 
-long int* GetVectorData(Vector* vector) {
+int* GetVectorData(Vector* vector) {
     return vector->data;
 }
 
-int GetVectorDataElement(Vector* vector, int index, long int* destination) {
+int GetVectorDataElement(Vector* vector, int index, int* destination) {
     if (index < 0 || index >= vector->length) {
         return false;
     }
@@ -70,7 +71,7 @@ int GetVectorDataElement(Vector* vector, int index, long int* destination) {
     return true;
 }
 
-void Combine1(Vector* vector, long int* destination) {
+void Combine1(Vector* vector, int* destination) {
     int i;
 
     *destination = 0;
@@ -78,13 +79,13 @@ void Combine1(Vector* vector, long int* destination) {
     for (i = 0; i < GetVectorLength(vector); i++) {
         int value;
 
-        GetVectorDataElement(vector, i, (long*) &value);
+        GetVectorDataElement(vector, i, (int*) &value);
 
         *destination += value;
     }
 }
 
-void Combine2(Vector* vector, long int* destination) {
+void Combine2(Vector* vector, int* destination) {
     int i;
     int length = GetVectorLength(vector);
 
@@ -93,16 +94,16 @@ void Combine2(Vector* vector, long int* destination) {
     for (i = 0; i < length; i++) {
         int value;
 
-        GetVectorDataElement(vector, i, (long*) &value);
+        GetVectorDataElement(vector, i, (int*) &value);
 
         *destination += value;
     }
 }
 
-void Combine3(Vector* vector, long int* destination) {
+void Combine3(Vector* vector, int* destination) {
     int i;
     int length = GetVectorLength(vector);
-    long int* data = GetVectorData(vector);
+    int* data = GetVectorData(vector);
 
     *destination = 0;
 
@@ -111,11 +112,11 @@ void Combine3(Vector* vector, long int* destination) {
     }
 }
 
-void Combine4(Vector* vector, long int* destination) {
+void Combine4(Vector* vector, int* destination) {
     int i;
     int length = GetVectorLength(vector);
-    long int* data = GetVectorData(vector);
-    long int sum = 0;
+    int* data = GetVectorData(vector);
+    int sum = 0;
 
     for (i = 0; i < length; i++) {
         sum += data[i];
@@ -126,14 +127,18 @@ void Combine4(Vector* vector, long int* destination) {
 
 
 int main() {
-    Vector* vector = InitializeVector(5);
-    long int sum;
+    FILE* file = fopen("vector_data.txt", "r");
+    Vector* vector = InitializeVector(NUM_ELEMENT);
+    int sum;
+    int i;
 
-    vector->data[0] = 1;
-    vector->data[1] = 2;
-    vector->data[2] = 4;
-    vector->data[3] = 8;
-    vector->data[4] = 16;
+    if (file == NULL) {
+        printf("Can't open file with \'r\' option.\n");
+    } else {
+        for (i = 0; i < NUM_ELEMENT; i++) {
+            fscanf(file, "%d", vector->data + i);
+        }
+    }
 
 #if COMBINE_VERSION == 1
     Combine1(vector, &sum);
@@ -145,7 +150,9 @@ int main() {
     Combine4(vector, &sum);
 #endif
 
-    printf("Sum of vector: %ld\n", sum);
+    printf("Sum of vector: %d,%d,%d\n", sum / 1000000 % 1000, sum / 1000 % 1000, sum % 1000);
+    free(vector);
+    fclose(file);
 
     return 0;
 }
