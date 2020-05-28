@@ -80,7 +80,7 @@ void Combine1(Vector* vector, long long int* destination) {
     for (i = 0; i < GetVectorLength(vector); i++) {
         int value;
 
-        GetVectorDataElement(vector, i, (int*) &value);
+        GetVectorDataElement(vector, i, (int*)&value);
 
         *destination += value;
     }
@@ -95,7 +95,7 @@ void Combine2(Vector* vector, long long int* destination) {
     for (i = 0; i < length; i++) {
         int value;
 
-        GetVectorDataElement(vector, i, (int*) &value);
+        GetVectorDataElement(vector, i, (int*)&value);
 
         *destination += value;
     }
