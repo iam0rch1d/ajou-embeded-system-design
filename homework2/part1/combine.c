@@ -5,7 +5,7 @@
 #define COMBINE_VERSION 1
 #define VECTOR_DATA_LENGTH 100000
 #define NUM_COMBINE_LOOP 100000
-#define CPU_FREQUENCY 442000000
+#define CPU_FREQUENCY 2600000000
 
 enum boolean {
     false = 0,
