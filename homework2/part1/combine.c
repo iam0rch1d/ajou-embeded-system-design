@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
-#define COMBINE_VERSION 4
+#define COMBINE_VERSION 1
 #define VECTOR_DATA_LENGTH 100000
 #define NUM_COMBINE_LOOP 100000
+#define CPU_FREQUENCY 442000000
 
 enum boolean {
     false = 0,
@@ -127,41 +129,11 @@ void Combine4(Vector* vector, long long int* destination) {
 }
 
 
-static unsigned cyc_hi = 0;
-static unsigned cyc_lo = 0;
-
-void access_counter(unsigned *hi, unsigned *lo);
-void start_counter();
-double get_counter();
-
-
-void access_counter(unsigned *hi, unsigned *lo) {
-    asm("rdtsc; movl %%edx,%0; movl %%eax,%1"
-    : "=r" (*hi), "=r" (*lo) // Output list
-    : // Input list
-    : "%edx", "%eax"); // Clobbers list
-}
-
-void start_counter() {
-    access_counter(&cyc_hi, &cyc_lo);
-}
-
-double get_counter() {
-    unsigned ncyc_hi, ncyc_lo;
-    unsigned hi, lo, borrow;
-
-    access_counter(&ncyc_hi, &ncyc_lo);
-    lo = ncyc_lo - cyc_lo;
-    borrow = lo > ncyc_lo;
-    hi = ncyc_hi - cyc_hi - borrow;
-
-    return (double)hi * (1u << 30u) * 4 + lo;
-}
-
-
 int main() {
     FILE* file = fopen("vector_data.txt", "r");
-    double elapsedClock;
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
     Vector* vector = InitializeVector(VECTOR_DATA_LENGTH);
     long long int sum;
     int i;
@@ -174,7 +146,7 @@ int main() {
         }
     }
 
-    start_counter();
+    gettimeofday(&timeStart, NULL);
 
     for (i = 0; i < NUM_COMBINE_LOOP; i++) {
 #if COMBINE_VERSION == 1
@@ -188,15 +160,17 @@ int main() {
 #endif
     }
 
-    elapsedClock = get_counter();
+    gettimeofday(&timeFinish, NULL);
 
-    printf("--- Profile of Combine%d() loop ---\n", COMBINE_VERSION);
-    printf("Sum of vector data: %lld,%03lld,%03lld,%03lld\n",
-           sum / 1000000000 % 1000,
-           sum / 1000000 % 1000,
-           sum / 1000 % 1000,
-           sum % 1000);
-    printf("CPE: %f\n", elapsedClock / VECTOR_DATA_LENGTH / NUM_COMBINE_LOOP);
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Sum of vector: %lld,%03lld,%03lld,%03lld\n",
+	    sum / 1000000000 % 1000,
+	    sum / 1000000 % 1000,
+	    sum / 1000 % 1000,
+	    sum % 1000);
+    printf("Elapsed time: %f [sec]\n", timeSeconds);
+    printf("CPE: %f\n", timeSeconds * CPU_FREQUENCY / VECTOR_DATA_LENGTH / NUM_COMBINE_LOOP);
 
     free(vector);
     fclose(file);
