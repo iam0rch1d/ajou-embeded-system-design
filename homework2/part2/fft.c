@@ -1,9 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <math.h>
-#include <time.h>
-#include <windows.h>
 
 #define MAX(a, b)    (((a) > (b)) ? (a) : (b))
 #define PI  3.141592
