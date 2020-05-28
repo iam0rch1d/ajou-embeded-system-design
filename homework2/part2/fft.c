@@ -15,9 +15,9 @@ FILE *fp;
 FILE *open_read(char *);
 
 FILE *open_write(char *);
-void read_record(FILE *, double *, int);
+void read_record(double *, int);
 void write_record(double *, int);
-double *read_double_record(FILE *);
+double *read_double_record();
 
 /* function prototypes for dft and inverse dft functions */
 void fft(COMPLEX *, unsigned int);
@@ -120,7 +120,7 @@ Exits if a read error occurs or if the DSP_FILE structure is invalid.
 Void read_record(FILE *fp , double *input , int length)
 ********************************************************************/
 
-void read_record(FILE *fp, double *input, int length) {
+void read_record(double *input, int length) {
     int i;
     for (i = 0; i < length; i++) {
         fscanf(fp, "%lf\n", &input[length + i]);
@@ -134,7 +134,7 @@ Exits if a read or allocation error occurs.
 float *read_double_record(DSP_FILE *dsp_info)
 ************************************************************************************************************************/
 
-double *read_double_record(FILE *fp) {
+double *read_double_record() {
     static double *buf;            /* input buffer to read data in */
     double *out;                    /* return output pointer */
     double *out_ptr;
@@ -148,7 +148,7 @@ double *read_double_record(FILE *fp) {
     out = (double *) calloc(length, sizeof(double));
 
 /* read the record into buf */
-    read_record(fp, buf, length);
+    read_record(buf, length);
 
 /* perform conversion to floating point */
     out_ptr = out;
