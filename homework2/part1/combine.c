@@ -164,7 +164,7 @@ int main() {
 
     timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
 
-    printf("Sum of vector: %lld,%03lld,%03lld,%03lld\n",
+    printf("Sum of vector data: %lld,%03lld,%03lld,%03lld\n",
 	    sum / 1000000000 % 1000,
 	    sum / 1000000 % 1000,
 	    sum / 1000 % 1000,
