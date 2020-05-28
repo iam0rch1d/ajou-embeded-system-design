@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <sys/time.h>
 
 #define MAX(a, b)    (((a) > (b)) ? (a) : (b))
 #define PI  3.141592
@@ -31,6 +32,12 @@ and reconstructed time domain data.
 ************************************************************************/
 
 int main(void) {
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
+
+    gettimeofday(&timeStart, NULL);
+
     int i, length, fft_length;
     unsigned int m;
     double tempflt;
@@ -63,6 +70,12 @@ int main(void) {
     fp = open_write("test_out.txt");  //��� ���� �ؽ�Ʈ //
     write_record(log_mag, length);
 
+    gettimeofday(&timeFinish, NULL);
+
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Total Execution time: %f [sec]\n", timeSeconds);
+
     return 0;
 }
 
@@ -85,12 +98,25 @@ DSP_FILE *open_read(char *file_name)
 
 FILE *open_read(char *file_name) /* file name string */
 {
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
+
+    gettimeofday(&timeStart, NULL);
+
 /* allocate the DSP data file structure */
 
     fp = (FILE *) malloc(sizeof(FILE));
 
 /* open file for text read and update */
     fp = fopen(file_name, "r");
+
+    gettimeofday(&timeFinish, NULL);
+
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Execution time of open_read(): %f [sec]\n", timeSeconds);
+
     return (fp);
 }
 
@@ -106,11 +132,23 @@ DSP_FILE *open_write(char *file_name, int records,int rec_len)
 *************************************************************************/
 
 FILE *open_write(char *file_name) {
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
+
+    gettimeofday(&timeStart, NULL);
+
 /* allocate the DSP data file structure */
     fp = (FILE *) malloc(sizeof(FILE));
 
 /* open file for text write and update*/
     fp = fopen(file_name, "wt");
+
+    gettimeofday(&timeFinish, NULL);
+
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Execution time of open_write(): %f [sec]\n", timeSeconds);
     return (fp);
 }
 
@@ -135,6 +173,12 @@ float *read_double_record(DSP_FILE *dsp_info)
 ************************************************************************************************************************/
 
 double *read_double_record() {
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
+
+    gettimeofday(&timeStart, NULL);
+
     static double *buf;            /* input buffer to read data in */
     double *out;                    /* return output pointer */
     double *out_ptr;
@@ -156,6 +200,12 @@ double *read_double_record() {
     for (i = 0; i < length; i++)
         *out_ptr++ = (double) (*d_ptr++);
 
+    gettimeofday(&timeFinish, NULL);
+
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Execution time of read_double_record: %f [sec]\n", timeSeconds);
+
     return (out);                 /* return converted pointer */
 }
 
@@ -168,10 +218,22 @@ void write_record(char *ptr,DSP_FILE *dsp_info, int length)
 *************************************************************************/
 
 void write_record(double *ptr, int length) {
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
+
+    gettimeofday(&timeStart, NULL);
+
     int i;
     for (i = 0; i < length; i++) {
         fprintf(fp, "%lf\n", *ptr++);
     }
+
+    gettimeofday(&timeFinish, NULL);
+
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Execution time of write_record(): %f [sec]\n", timeSeconds);
 }
 
 /**********************************************************************
@@ -188,6 +250,12 @@ void fft(COMPLEX *x, int m)
 ***********************************************************************/
 
 void fft(COMPLEX *x, unsigned int m) {
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
+
+    gettimeofday(&timeStart, NULL);
+
     static COMPLEX *w;           // used to store the w complex array
     static unsigned int mstore = 0;       // stores m for future reference
     static int n = 1;            // length of fft stored for future
@@ -280,7 +348,11 @@ void fft(COMPLEX *x, unsigned int m) {
         }
     }
 
+    gettimeofday(&timeFinish, NULL);
 
+    timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+    printf("Execution time of fft(): %f [sec]\n", timeSeconds);
 }
 
 /**************************************************************************
@@ -290,12 +362,34 @@ if log2exponent(i) is between two values, the larger is returned.
 int log2exponent(unsigned int x)
 *************************************************************************/
 unsigned int log2exponent(unsigned int x) {
+    struct timeval timeStart;
+    struct timeval timeFinish;
+    double timeSeconds;
+
+    gettimeofday(&timeStart, NULL);
+
     unsigned int mask, i;
 
-    if (x == 0) return (-1);      // zero is an error, return -1
+    if (x == 0) {
+        gettimeofday(&timeFinish, NULL);
+
+        timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+        printf("Execution time of log2exponent(): %f [sec]\n", timeSeconds);
+
+        return -1;      // zero is an error, return -1
+    }
     x--;                        // get the max index, x-1
     for (mask = 1, i = 0;; mask *= 2, i++) {
-        if (x == 0) return i;   // return log2exponent if all zero
+        if (x == 0) {
+            gettimeofday(&timeFinish, NULL);
+
+            timeSeconds = (timeFinish.tv_sec - timeStart.tv_sec) + 1e-6 * (timeFinish.tv_usec - timeStart.tv_usec);
+
+            printf("Execution time of log2exponent(): %f [sec]\n", timeSeconds);
+
+            return i;   // return log2exponent if all zero
+        }
         x = x & (~mask);        // AND off a bit
     }
 
