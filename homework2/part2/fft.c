@@ -121,9 +121,9 @@ Void read_record(FILE *fp , double *input , int length)
 ********************************************************************/
 
 void read_record(FILE *fp, double *input, int length) {
-    int status, i;
+    int i;
     for (i = 0; i < length; i++) {
-        status = fscanf(fp, "%lf\n", &input[length + i]);
+        fscanf(fp, "%lf\n", &input[length + i]);
     }
 }
 
@@ -168,9 +168,9 @@ void write_record(char *ptr,DSP_FILE *dsp_info, int length)
 *************************************************************************/
 
 void write_record(double *ptr, int length) {
-    int status, i;
+    int i;
     for (i = 0; i < length; i++) {
-        status = fprintf(fp, "%lf\n", *ptr++);
+        fprintf(fp, "%lf\n", *ptr++);
     }
 }
 
