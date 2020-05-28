@@ -3,7 +3,7 @@
 #include <sys/time.h>
 
 #define COMBINE_VERSION 1
-#define VECTOR_DATA_SIZE 100000
+#define VECTOR_DATA_LENGTH 100000
 #define NUM_COMBINE_LOOP 100000
 #define CPU_FREQUENCY 442000000
 
@@ -134,14 +134,14 @@ int main() {
     struct timeval timeStart;
     struct timeval timeFinish;
     double timeSeconds;
-    Vector* vector = InitializeVector(VECTOR_DATA_SIZE);
+    Vector* vector = InitializeVector(VECTOR_DATA_LENGTH);
     long long int sum;
     int i;
 
     if (file == NULL) {
         printf("Can't open file with \'r\' option.\n");
     } else {
-        for (i = 0; i < VECTOR_DATA_SIZE; i++) {
+        for (i = 0; i < VECTOR_DATA_LENGTH; i++) {
             fscanf(file, "%d", vector->data + i);
         }
     }
@@ -170,7 +170,7 @@ int main() {
 	    sum / 1000 % 1000,
 	    sum % 1000);
     printf("Elapsed time: %f [sec]\n", timeSeconds);
-    printf("CPE: %f\n", timeSeconds * CPU_FREQUENCY / VECTOR_DATA_SIZE / NUM_COMBINE_LOOP);
+    printf("CPE: %f\n", timeSeconds * CPU_FREQUENCY / VECTOR_DATA_LENGTH / NUM_COMBINE_LOOP);
 
     free(vector);
     fclose(file);
