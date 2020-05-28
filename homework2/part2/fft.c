@@ -33,7 +33,7 @@ Generates DSP_FILE format files for spectral magnitude
 and reconstructed time domain data.
 ************************************************************************/
 
-void main(void) {
+int main(void) {
     int i, length, fft_length, m;
     double tempflt;
     double *signal, *log_mag;
@@ -64,6 +64,8 @@ void main(void) {
     }
     fp = open_write("test_out.txt");  //��� ���� �ؽ�Ʈ //
     write_record(log_mag, length);
+
+    return 0;
 }
 
 /**************************************************************************
