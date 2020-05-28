@@ -23,8 +23,8 @@ void write_record(double *, int);
 double *read_double_record(FILE *);
 
 /* function prototypes for dft and inverse dft functions */
-void fft(COMPLEX *, int);
-int log2exponent(unsigned int);
+void fft(COMPLEX *, unsigned int);
+unsigned int log2exponent(unsigned int);
 
 /************************************************************************
 IFFTTEST.C - Demonstrate and test FFT and Inverse FFT functions
@@ -34,7 +34,8 @@ and reconstructed time domain data.
 ************************************************************************/
 
 int main(void) {
-    int i, length, fft_length, m;
+    int i, length, fft_length;
+    unsigned int m;
     double tempflt;
     double *signal, *log_mag;
     COMPLEX *samp;
@@ -46,7 +47,7 @@ int main(void) {
 
 // determine fft size and allocate the complex array - fft size�� �迭
     m = log2exponent(length);
-    fft_length = 1 << m;   //bit shift
+    fft_length = (unsigned char) 1 << m;   //bit shift
     samp = (COMPLEX *) calloc(fft_length, sizeof(COMPLEX));
 
 // copy input signal to complex array and do the fft
@@ -189,9 +190,9 @@ Requires pointer to complex array, x and power of 2 size of FFT, m
 void fft(COMPLEX *x, int m)
 ***********************************************************************/
 
-void fft(COMPLEX *x, int m) {
+void fft(COMPLEX *x, unsigned int m) {
     static COMPLEX *w;           // used to store the w complex array
-    static int mstore = 0;       // stores m for future reference
+    static unsigned int mstore = 0;       // stores m for future reference
     static int n = 1;            // length of fft stored for future
 
     COMPLEX u, temp, tm;
@@ -291,13 +292,13 @@ Returns base 2 log such that i = 2^ans where ans = log2exponent(i).
 if log2exponent(i) is between two values, the larger is returned.
 int log2exponent(unsigned int x)
 *************************************************************************/
-int log2exponent(unsigned int x) {
+unsigned int log2exponent(unsigned int x) {
     unsigned int mask, i;
 
     if (x == 0) return (-1);      // zero is an error, return -1
     x--;                        // get the max index, x-1
     for (mask = 1, i = 0;; mask *= 2, i++) {
-        if (x == 0) return (i);   // return log2exponent if all zero
+        if (x == 0) return i;   // return log2exponent if all zero
         x = x & (~mask);        // AND off a bit
     }
 
