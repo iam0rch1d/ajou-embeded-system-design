@@ -100,6 +100,7 @@ int main(void) {
     }
 
     fp = open_write("test_out.txt");
+    
     write_record(log_mag, length);
 
     gettimeofday(&timeFinish, NULL);
@@ -190,6 +191,7 @@ FILE *open_write(char *file_name) {
 
 void read_record(double *input, int length) {
     int i;
+
     for (i = 0; i < length; i += 4) {
         fscanf(fp, "%lf\n", &input[length + i]);
         fscanf(fp, "%lf\n", &input[length + i + 1]);
@@ -235,6 +237,7 @@ double *read_double_record() {
     // perform conversion to floating point
     out_ptr = out;
     d_ptr = buf + 128;
+
     for (i = 0; i < length; i += 4) {
         *out_ptr++ = (double) (*d_ptr++);
         *out_ptr++ = (double) (*d_ptr++);
