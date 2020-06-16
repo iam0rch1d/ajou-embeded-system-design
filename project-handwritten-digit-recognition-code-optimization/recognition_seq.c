@@ -1,17 +1,15 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include "recognition.h"
 #include <math.h>
+
+#include "recognition.h"
 
 #define sigmoid(x) (1 / (1 + exp(-x)))
 
 void recognition(float *images, float *network, int depth, int size, int *labels, float *confidences) {
     int i, j, x, y;
-    float *hidden_layers, *temp, **weights, **biases;
-
-    hidden_layers = (float *) malloc(sizeof(float) * size * depth);
-    weights = (float **) malloc(sizeof(float *) * (depth + 1));
-    biases = (float **) malloc(sizeof(float *) * (depth + 1));
+    float *hidden_layers = (float *) malloc(sizeof(float) * size * depth);
+    float **weights = (float **) malloc(sizeof(float *) * (depth + 1));
+    float **biases = (float **) malloc(sizeof(float *) * (depth + 1));
 
     // Set pointers for weights and biases
     // Part 1 - Input layer
@@ -19,13 +17,14 @@ void recognition(float *images, float *network, int depth, int size, int *labels
     biases[0] = weights[0] + size * IMG_SIZE;
 
     // Part 2 - Hidden layers
+    int size_square = size * size;
     for (i = 1; i < depth; i++) {
-        weights[i] = network + (size * IMG_SIZE + size) + (size * size + size) * (i - 1);
-        biases[i] = weights[i] + size * size;
+        weights[i] = network + (size * IMG_SIZE + size) + (size_square + size) * (i - 1);
+        biases[i] = weights[i] + size_square;
     }
 
     // Part 3 - Output layer
-    weights[depth] = weights[depth - 1] + size * size + size;
+    weights[depth] = weights[depth - 1] + size_square + size;
     biases[depth] = weights[depth] + DIGIT_COUNT * size;
 
     // Recognize numbers
@@ -36,9 +35,10 @@ void recognition(float *images, float *network, int depth, int size, int *labels
         // From the input layer to the first hidden layer
         for (x = 0; x < size; x++) {
             float sum = 0;
+            int img_size_by_x = IMG_SIZE * x;
 
             for (y = 0; y < IMG_SIZE; y++) {
-                sum += input[y] * weights[0][IMG_SIZE * x + y];
+                sum += input[y] * weights[0][img_size_by_x + y];
             }
 
             sum += biases[0][x];
@@ -49,22 +49,26 @@ void recognition(float *images, float *network, int depth, int size, int *labels
         for (j = 1; j < depth; j++) {
             for (x = 0; x < size; x++) {
                 float sum = 0;
+                int size_by_j = size * j;
+                int size_by_x = size * x;
 
                 for (y = 0; y < size; y++) {
-                    sum += hidden_layers[size * (j - 1) + y] * weights[j][size * x + y];
+                    sum += hidden_layers[size_by_j - size + y] * weights[j][size_by_x + y];
                 }
 
                 sum += biases[j][x];
-                hidden_layers[size * j + x] = sigmoid(sum);
+                hidden_layers[size_by_j + x] = sigmoid(sum);
             }
         }
 
         // From the last hidden layer to the output layer
         for (x = 0; x < DIGIT_COUNT; x++) {
             float sum = 0;
+            int size_by_depthminus1 = size * (depth - 1);
+            int size_by_x = size * x;
 
             for (y = 0; y < size; y++) {
-                sum += hidden_layers[size * (depth - 1) + y] * weights[depth][size * x + y];
+                sum += hidden_layers[size_by_depthminus1 + y] * weights[depth][size_by_x + y];
             }
 
             sum += biases[depth][x];
