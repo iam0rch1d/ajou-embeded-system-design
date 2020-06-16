@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 
     accuracy = (float) correct / (float) IMG_COUNT;
 
-    printf("Elapsed time: %lld.%03ld sec\n", spent.tv_sec, spent.tv_nsec / 1000 / 1000);
+    printf("Elapsed time: %d.%03d sec\n", spent.tv_sec, spent.tv_nsec / 1000 / 1000);
     printf("Accuracy: %.3f\n", accuracy);
 
     // Write result
