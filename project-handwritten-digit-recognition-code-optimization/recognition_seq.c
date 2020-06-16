@@ -18,8 +18,10 @@ void recognition(float *images, float *network, int depth, int size, int *labels
 
     // Part 2 - Hidden layers
     int size_square = size * size;
+    int weight_constant = (int) (network + size * IMG_SIZE + size);
+
     for (i = 1; i < depth; i++) {
-        weights[i] = network + (size * IMG_SIZE + size) + (size_square + size) * (i - 1);
+        weights[i] = (float *) (weight_constant + (size_square + size) * (i - 1));
         biases[i] = weights[i] + size_square;
     }
 
@@ -28,48 +30,62 @@ void recognition(float *images, float *network, int depth, int size, int *labels
     biases[depth] = weights[depth] + DIGIT_COUNT * size;
 
     // Recognize numbers
+    int img_size_by_i = 0;
+
     for (i = 0; i < IMG_COUNT; i++) {
-        float *input = images + IMG_SIZE * i;
+        float *input = images + img_size_by_i;
         float output[DIGIT_COUNT];
 
+        img_size_by_i += IMG_SIZE;
+
         // From the input layer to the first hidden layer
+        int img_size_by_x = 0;
+
         for (x = 0; x < size; x++) {
             float sum = 0;
-            int img_size_by_x = IMG_SIZE * x;
 
             for (y = 0; y < IMG_SIZE; y++) {
                 sum += input[y] * weights[0][img_size_by_x + y];
             }
 
+            img_size_by_x += IMG_SIZE;
             sum += biases[0][x];
             hidden_layers[x] = sigmoid(sum);
         }
 
         // Between hidden layers
+        int size_by_j = size;
+        int size_by_x = 0;
+
         for (j = 1; j < depth; j++) {
             for (x = 0; x < size; x++) {
                 float sum = 0;
-                int size_by_j = size * j;
-                int size_by_x = size * x;
 
                 for (y = 0; y < size; y++) {
                     sum += hidden_layers[size_by_j - size + y] * weights[j][size_by_x + y];
                 }
 
+                size_by_x += size;
+
                 sum += biases[j][x];
                 hidden_layers[size_by_j + x] = sigmoid(sum);
             }
+
+            size_by_j += size;
         }
 
         // From the last hidden layer to the output layer
+        int size_by_depthminus1 = size * (depth - 1);
+        size_by_x = 0;
+
         for (x = 0; x < DIGIT_COUNT; x++) {
             float sum = 0;
-            int size_by_depthminus1 = size * (depth - 1);
-            int size_by_x = size * x;
 
             for (y = 0; y < size; y++) {
                 sum += hidden_layers[size_by_depthminus1 + y] * weights[depth][size_by_x + y];
             }
+
+            size_by_x += size;
 
             sum += biases[depth][x];
             output[x] = sigmoid(sum);
