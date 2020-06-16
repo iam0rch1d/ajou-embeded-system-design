@@ -1,0 +1,2 @@
+*.bin filter=lfs diff=lfs merge=lfs -text
+project-handwritten-digit-recognition-acceleration/*.bin filter=lfs diff=lfs merge=lfs -text
