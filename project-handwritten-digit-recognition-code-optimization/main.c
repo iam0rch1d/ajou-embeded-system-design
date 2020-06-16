@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    // Load data from '.network' file
     io_file = fopen(argv[1], "r");
 
     if (!io_file) {
@@ -22,12 +23,11 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    // Load data of depth, size
     int depth;
     int size;
 
-    fread(&depth, sizeof(int), 1, io_file);
-    fread(&size, sizeof(int), 1, io_file);
+    fread(&depth, sizeof(int), 1, io_file); // Load data of depth
+    fread(&size, sizeof(int), 1, io_file); // Load data size
     printf("size=%d, depth=%d\n", size, depth);
 
     int total_network_size = (IMG_SIZE * size + size)
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     fread(network, sizeof(float), total_network_size, io_file);
     fclose(io_file);
 
-    // Load data
+    // Load data from 'MNIST_image.bin'
     float *images = (float *) malloc(sizeof(float) * IMG_COUNT * IMG_SIZE);
     int *labels_actual = (int *) malloc(sizeof(int) * IMG_COUNT);
 
@@ -48,12 +48,13 @@ int main(int argc, char **argv) {
     fread(images, sizeof(float), IMG_COUNT * IMG_SIZE, io_file); // Load data of images
     fclose(io_file);
 
+    // Load data from 'MNIST_label.bin'
     io_file = fopen("MNIST_label.bin", "r");
 
     fread(labels_actual, sizeof(int), IMG_COUNT, io_file); // Load data of actual labels
     fclose(io_file);
 
-    // Measure execution time
+    // Measure elapsed time
     struct timespec start, end, spent;
     int *labels_expected = (int *) malloc(sizeof(int) * IMG_COUNT);
     float *confidences = (float *) malloc(sizeof(float) * IMG_COUNT);
@@ -73,10 +74,11 @@ int main(int argc, char **argv) {
 
     float accuracy = (float) correct / (float) IMG_COUNT;
 
+    // Print elapsed time, accuracy
     printf("Elapsed time: %d.%03d sec\n", (int) spent.tv_sec, (int) spent.tv_nsec / 1000000);
     printf("Accuracy: %.3f\n", accuracy);
 
-    // Write result
+    // Write result data
     io_file = fopen(argv[2], "wb");
 
     fprintf(io_file, "%.3f\n", accuracy);
