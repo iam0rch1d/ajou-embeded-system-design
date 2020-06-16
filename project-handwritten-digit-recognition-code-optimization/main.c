@@ -1,21 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
 #include "recognition.h"
 
 int timespec_subtract(struct timespec *, struct timespec *, struct timespec *);
-void load_MNIST(float *images, int *labels);
 
 int main(int argc, char **argv) {
     FILE *io_file;
-    float *images, *network, *confidences, accuracy;
-    int *labels;
-    int *labels_ans;
-    int i, correct, total_network_size;
-    int size = 4096, depth = 3;
-    struct timespec start, end, spent;
 
     // Check parameters
     if (argc < 3) {
@@ -23,10 +15,10 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    images = (float *) malloc(sizeof(float) * IMG_COUNT * IMG_SIZE);
-    labels = (int *) malloc(sizeof(int) * IMG_COUNT);
-    labels_ans = (int *) malloc(sizeof(int) * IMG_COUNT);
-    confidences = (float *) malloc(sizeof(float) * IMG_COUNT);
+    float *images = (float *) malloc(sizeof(float) * IMG_COUNT * IMG_SIZE);
+    int *labels_actual = (int *) malloc(sizeof(int) * IMG_COUNT);
+    int *labels_expected = (int *) malloc(sizeof(int) * IMG_COUNT);
+    float *confidences = (float *) malloc(sizeof(float) * IMG_COUNT);
 
     io_file = fopen(argv[1], "r");
 
@@ -35,41 +27,49 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    fread(&depth, sizeof(int), 1, io_file);
+    int size;
+    int depth;
+
     fread(&size, sizeof(int), 1, io_file);
+    fread(&depth, sizeof(int), 1, io_file);
     printf("size=%d, depth=%d\n", size, depth);
 
-    total_network_size = (IMG_SIZE * size + size)
+    int total_network_size = (IMG_SIZE * size + size)
             + (depth - 1) * (size * size + size)
             + size * DIGIT_COUNT
             + DIGIT_COUNT;
-    network = (float *) malloc(sizeof(float) * (total_network_size));
+    float *network = (float *) malloc(sizeof(float) * (total_network_size));
 
     fread(network, sizeof(float), total_network_size, io_file);
     fclose(io_file);
 
     io_file = fopen("MNIST_image.bin", "r");
 
-    fread(images, sizeof(float), IMG_COUNT * IMG_SIZE, io_file);
+    fread(images, sizeof(float), IMG_COUNT * IMG_SIZE, io_file); // Load data of images
     fclose(io_file);
 
     io_file = fopen("MNIST_label.bin", "r");
 
-    fread(labels_ans, sizeof(int), IMG_COUNT, io_file);
+    fread(labels_actual, sizeof(int), IMG_COUNT, io_file); // Load data of actual labels
     fclose(io_file);
 
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    recognition(images, network, depth, size, labels, confidences);
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    // Measure execution time
+    struct timespec start, end, spent;
+
+    clock_gettime(CLOCK_MONOTONIC, &start); // Start timer
+    recognition(images, network, depth, size, labels_expected, confidences);
+    clock_gettime(CLOCK_MONOTONIC, &end); // End timer
     timespec_subtract(&spent, &end, &start);
 
-    correct = 0;
+    // Calculate accuracy
+    int i = 0;
+    int correct = 0;
 
     for (i = 0; i < IMG_COUNT; i++) {
-        if (labels_ans[i] == labels[i]) correct++;
+        if (labels_actual[i] == labels_expected[i]) correct++;
     }
 
-    accuracy = (float) correct / (float) IMG_COUNT;
+    float accuracy = (float) correct / (float) IMG_COUNT;
 
     printf("Elapsed time: %d.%03d sec\n", spent.tv_sec, spent.tv_nsec / 1000 / 1000);
     printf("Accuracy: %.3f\n", accuracy);
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     fprintf(io_file, "%.3f\n", accuracy);
 
     for (i = 0; i < IMG_COUNT; i++) {
-        fprintf(io_file, "%d, %d, %.3f\n", labels_ans[i], labels[i], confidences[i]);
+        fprintf(io_file, "%d, %d, %.3f\n", labels_actual[i], labels_expected[i], confidences[i]);
     }
 
     fclose(io_file);
