@@ -27,12 +27,12 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    int size;
     int depth;
+    int size;
 
-    fread(&size, sizeof(int), 1, io_file);
     fread(&depth, sizeof(int), 1, io_file);
-    printf("size=%d, depth=%d\n", size, depth);
+    fread(&size, sizeof(int), 1, io_file);
+    printf("depth=%d, size=%d\n", depth, size);
 
     int total_network_size = (IMG_SIZE * size + size)
             + (depth - 1) * (size * size + size)
