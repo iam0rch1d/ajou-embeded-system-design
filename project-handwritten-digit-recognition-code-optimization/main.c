@@ -9,16 +9,11 @@ int timespec_subtract(struct timespec *, struct timespec *, struct timespec *);
 int main(int argc, char **argv) {
     FILE *io_file;
 
-    // Check parameters
+    // Check arguments of file input/output
     if (argc < 3) {
         fprintf(stderr, "Usage: %s <network file> <output file>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
-
-    float *images = (float *) malloc(sizeof(float) * IMG_COUNT * IMG_SIZE);
-    int *labels_actual = (int *) malloc(sizeof(int) * IMG_COUNT);
-    int *labels_expected = (int *) malloc(sizeof(int) * IMG_COUNT);
-    float *confidences = (float *) malloc(sizeof(float) * IMG_COUNT);
 
     io_file = fopen(argv[1], "r");
 
@@ -27,12 +22,13 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    // Load data of depth, size
     int depth;
     int size;
 
     fread(&depth, sizeof(int), 1, io_file);
     fread(&size, sizeof(int), 1, io_file);
-    printf("depth=%d, size=%d\n", depth, size);
+    printf("size=%d, depth=%d\n", size, depth);
 
     int total_network_size = (IMG_SIZE * size + size)
             + (depth - 1) * (size * size + size)
@@ -42,6 +38,10 @@ int main(int argc, char **argv) {
 
     fread(network, sizeof(float), total_network_size, io_file);
     fclose(io_file);
+
+    // Load data
+    float *images = (float *) malloc(sizeof(float) * IMG_COUNT * IMG_SIZE);
+    int *labels_actual = (int *) malloc(sizeof(int) * IMG_COUNT);
 
     io_file = fopen("MNIST_image.bin", "r");
 
@@ -55,6 +55,8 @@ int main(int argc, char **argv) {
 
     // Measure execution time
     struct timespec start, end, spent;
+    int *labels_expected = (int *) malloc(sizeof(int) * IMG_COUNT);
+    float *confidences = (float *) malloc(sizeof(float) * IMG_COUNT);
 
     clock_gettime(CLOCK_MONOTONIC, &start); // Start timer
     recognition(images, network, depth, size, labels_expected, confidences);
@@ -71,7 +73,7 @@ int main(int argc, char **argv) {
 
     float accuracy = (float) correct / (float) IMG_COUNT;
 
-    printf("Elapsed time: %d.%03d sec\n", spent.tv_sec, spent.tv_nsec / 1000 / 1000);
+    printf("Elapsed time: %d.%03d sec\n", (int) spent.tv_sec, (int) spent.tv_nsec / 1000000);
     printf("Accuracy: %.3f\n", accuracy);
 
     // Write result
