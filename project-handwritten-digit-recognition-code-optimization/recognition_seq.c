@@ -10,11 +10,15 @@ void recognition(float *images, float *network, int depth, int size, int *labels
     float *hidden_layers = (float *) malloc(sizeof(float) * size * depth);
     float **weights = (float **) malloc(sizeof(float *) * (depth + 1));
     float **biases = (float **) malloc(sizeof(float *) * (depth + 1));
+    float *weights_zero;
+    float *biases_zero;
 
     // Set pointers for weights and biases
     // Part 1 - Input layer
     weights[0] = network;
     biases[0] = weights[0] + size * IMG_SIZE;
+    weights_zero = weights[0];
+    biases_zero = biases[0];
 
     // Part 2 - Hidden layers
     int size_square = size * size;
@@ -45,11 +49,11 @@ void recognition(float *images, float *network, int depth, int size, int *labels
             float sum = 0;
 
             for (y = 0; y < IMG_SIZE; y++) {
-                sum += input[y] * weights[0][img_size_by_x + y];
+                sum += input[y] * weights_zero[img_size_by_x + y];
             }
 
             img_size_by_x += IMG_SIZE;
-            sum += biases[0][x];
+            sum += biases_zero[x];
             hidden_layers[x] = sigmoid(sum);
         }
 
