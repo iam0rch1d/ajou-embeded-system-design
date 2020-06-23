@@ -48,15 +48,11 @@ void recognition(float *images, float *network, int depth, int size, int *labels
         for (x = 0; x < size; x++) {
             float sum = 0;
 
-            for (y = 0; y < IMG_SIZE; y += NUM_UNROLLING_ELEMENT) {
-                sum += input[y] * weights_zero[img_size_by_x + y];
-                sum += input[y + 1] * weights_zero[img_size_by_x + y + 1];
-                sum += input[y + 2] * weights_zero[img_size_by_x + y + 2];
-                sum += input[y + 3] * weights_zero[img_size_by_x + y + 3];
-                sum += input[y + 3] * weights_zero[img_size_by_x + y + 4];
-                sum += input[y + 3] * weights_zero[img_size_by_x + y + 5];
-                sum += input[y + 3] * weights_zero[img_size_by_x + y + 6];
-                sum += input[y + 3] * weights_zero[img_size_by_x + y + 7];
+            for (y = 0; y < IMG_SIZE;) {
+                sum += input[y] * weights_zero[img_size_by_x + y++];
+                sum += input[y] * weights_zero[img_size_by_x + y++];
+                sum += input[y] * weights_zero[img_size_by_x + y++];
+                sum += input[y] * weights_zero[img_size_by_x + y++];
             }
 
             img_size_by_x += IMG_SIZE;
@@ -72,15 +68,11 @@ void recognition(float *images, float *network, int depth, int size, int *labels
             for (x = 0; x < size; x++) {
                 float sum = 0;
 
-                for (y = 0; y < size; y += NUM_UNROLLING_ELEMENT) {
-                    sum += hidden_layers[size_by_j - size + y] * weights[j][size_by_x + y];
-                    sum += hidden_layers[size_by_j - size + y + 1] * weights[j][size_by_x + y + 1];
-                    sum += hidden_layers[size_by_j - size + y + 2] * weights[j][size_by_x + y + 2];
-                    sum += hidden_layers[size_by_j - size + y + 3] * weights[j][size_by_x + y + 3];
-                    sum += hidden_layers[size_by_j - size + y + 3] * weights[j][size_by_x + y + 4];
-                    sum += hidden_layers[size_by_j - size + y + 3] * weights[j][size_by_x + y + 5];
-                    sum += hidden_layers[size_by_j - size + y + 3] * weights[j][size_by_x + y + 6];
-                    sum += hidden_layers[size_by_j - size + y + 3] * weights[j][size_by_x + y + 7];
+                for (y = 0; y < size;) {
+                    sum += hidden_layers[size_by_j - size + y] * weights[j][size_by_x + y++];
+                    sum += hidden_layers[size_by_j - size + y] * weights[j][size_by_x + y++];
+                    sum += hidden_layers[size_by_j - size + y] * weights[j][size_by_x + y++];
+                    sum += hidden_layers[size_by_j - size + y] * weights[j][size_by_x + y++];
                 }
 
                 size_by_x += size;
@@ -99,15 +91,11 @@ void recognition(float *images, float *network, int depth, int size, int *labels
         for (x = 0; x < DIGIT_COUNT; x++) {
             float sum = 0;
 
-            for (y = 0; y < size; y += NUM_UNROLLING_ELEMENT) {
-                sum += hidden_layers[size_by_depthminus1 + y] * weights[depth][size_by_x + y];
-                sum += hidden_layers[size_by_depthminus1 + y + 1] * weights[depth][size_by_x + y + 1];
-                sum += hidden_layers[size_by_depthminus1 + y + 2] * weights[depth][size_by_x + y + 2];
-                sum += hidden_layers[size_by_depthminus1 + y + 3] * weights[depth][size_by_x + y + 3];
-                sum += hidden_layers[size_by_depthminus1 + y + 3] * weights[depth][size_by_x + y + 4];
-                sum += hidden_layers[size_by_depthminus1 + y + 3] * weights[depth][size_by_x + y + 5];
-                sum += hidden_layers[size_by_depthminus1 + y + 3] * weights[depth][size_by_x + y + 6];
-                sum += hidden_layers[size_by_depthminus1 + y + 3] * weights[depth][size_by_x + y + 7];
+            for (y = 0; y < size;) {
+                sum += hidden_layers[size_by_depthminus1 + y] * weights[depth][size_by_x + y++];
+                sum += hidden_layers[size_by_depthminus1 + y] * weights[depth][size_by_x + y++];
+                sum += hidden_layers[size_by_depthminus1 + y] * weights[depth][size_by_x + y++];
+                sum += hidden_layers[size_by_depthminus1 + y] * weights[depth][size_by_x + y++];
             }
 
             size_by_x += size;
